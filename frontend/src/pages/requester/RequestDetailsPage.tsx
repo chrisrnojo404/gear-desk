@@ -75,6 +75,10 @@ export function RequestDetailsPage() {
 
           <div className="mt-6 grid gap-5 md:grid-cols-2">
             <div>
+              <p className="text-sm text-slate-400">Activiteit type</p>
+              <p className="mt-2 text-base text-white">{request.activityType}</p>
+            </div>
+            <div>
               <p className="text-sm text-slate-400">Locatie</p>
               <p className="mt-2 text-base text-white">{request.location}</p>
             </div>
@@ -85,8 +89,14 @@ export function RequestDetailsPage() {
               </p>
             </div>
             <div>
-              <p className="text-sm text-slate-400">Opnamedatum</p>
-              <p className="mt-2 text-base text-white">{request.shootDate}</p>
+              <p className="text-sm text-slate-400">Datum</p>
+              <p className="mt-2 text-base text-white">{request.requestDate}</p>
+            </div>
+            <div>
+              <p className="text-sm text-slate-400">Tijdslot</p>
+              <p className="mt-2 text-base text-white">
+                {request.startTime} - {request.endTime}
+              </p>
             </div>
             <div>
               <p className="text-sm text-slate-400">Retourdatum</p>
@@ -116,6 +126,24 @@ export function RequestDetailsPage() {
           </div>
         </aside>
       </div>
+
+      <section className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5">
+        <h2 className="text-lg font-semibold text-white">Status timeline</h2>
+        <div className="mt-5 space-y-4">
+          {request.timeline.map((entry) => (
+            <div key={entry.id} className="flex gap-4">
+              <div className="mt-1 h-3 w-3 rounded-full bg-brand-500" />
+              <div>
+                <p className="text-sm font-medium text-white">{entry.label}</p>
+                <p className="mt-1 text-sm text-slate-400">
+                  {new Date(entry.timestamp).toLocaleString('nl-NL')} · {entry.actor}
+                </p>
+                {entry.note ? <p className="mt-1 text-sm text-slate-300">{entry.note}</p> : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   )
 }

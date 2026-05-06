@@ -82,7 +82,7 @@ export function PrintPage() {
           </div>
           <div className="text-sm text-slate-500">
             <p>ID: {request.id}</p>
-            <p>Draaidag: {request.shootDate}</p>
+            <p>Datum: {request.requestDate}</p>
           </div>
         </div>
 
@@ -98,6 +98,12 @@ export function PrintPage() {
           <div>
             <p className="text-sm text-slate-500">Locatie</p>
             <p className="mt-2 text-base font-medium">{request.location}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Tijdslot</p>
+            <p className="mt-2 text-base font-medium">
+              {request.startTime} - {request.endTime}
+            </p>
           </div>
           <div>
             <p className="text-sm text-slate-500">Retourdatum</p>

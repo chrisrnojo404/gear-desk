@@ -1,5 +1,7 @@
 import type {
   AdminCategory,
+  AdminCategoryFormValues,
+  AdminEquipmentFormValues,
   AdminEquipmentItem,
   AdminLogEntry,
   AdminOverview,
@@ -42,7 +44,7 @@ const adminUsers: AdminUser[] = [
   },
 ]
 
-const adminEquipment: AdminEquipmentItem[] = [
+let adminEquipment: AdminEquipmentItem[] = [
   {
     id: 'EQ-301',
     name: 'Sony FX6',
@@ -77,7 +79,7 @@ const adminEquipment: AdminEquipmentItem[] = [
   },
 ]
 
-const adminCategories: AdminCategory[] = [
+let adminCategories: AdminCategory[] = [
   { id: 'CAT-1', name: 'Camera', itemCount: 28, accessLevel: 'Level 1+' },
   { id: 'CAT-2', name: 'Audio', itemCount: 19, accessLevel: 'Level 1+' },
   { id: 'CAT-3', name: 'Lighting', itemCount: 14, accessLevel: 'Level 2 approval' },
@@ -170,9 +172,53 @@ export async function getAdminEquipment() {
   return [...adminEquipment]
 }
 
+export async function createAdminEquipment(values: AdminEquipmentFormValues) {
+  await delay()
+  const item: AdminEquipmentItem = {
+    id: `EQ-${Math.floor(400 + Math.random() * 500)}`,
+    ...values,
+  }
+  adminEquipment.unshift(item)
+  return item
+}
+
+export async function updateAdminEquipment(id: string, values: AdminEquipmentFormValues) {
+  await delay()
+  adminEquipment = adminEquipment.map((item) => (item.id === id ? { ...item, ...values } : item))
+  return adminEquipment.find((item) => item.id === id) ?? null
+}
+
+export async function deleteAdminEquipment(id: string) {
+  await delay()
+  adminEquipment = adminEquipment.filter((item) => item.id !== id)
+}
+
 export async function getAdminCategories() {
   await delay()
   return [...adminCategories]
+}
+
+export async function createAdminCategory(values: AdminCategoryFormValues) {
+  await delay()
+  const category: AdminCategory = {
+    id: `CAT-${adminCategories.length + 1}`,
+    ...values,
+  }
+  adminCategories.unshift(category)
+  return category
+}
+
+export async function updateAdminCategory(id: string, values: AdminCategoryFormValues) {
+  await delay()
+  adminCategories = adminCategories.map((category) =>
+    category.id === id ? { ...category, ...values } : category,
+  )
+  return adminCategories.find((category) => category.id === id) ?? null
+}
+
+export async function deleteAdminCategory(id: string) {
+  await delay()
+  adminCategories = adminCategories.filter((category) => category.id !== id)
 }
 
 export async function getAdminReports() {

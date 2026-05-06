@@ -42,7 +42,7 @@ export function ProcessRequestPage() {
     void loadRequest()
   }, [requestId])
 
-  const handleStatusChange = async (nextStatus: ProcessorRequestStatus) => {
+  const handleStatusChange = async (nextStatus: ProcessorRequestStatus, note?: string) => {
     if (!request) {
       return
     }
@@ -51,7 +51,7 @@ export function ProcessRequestPage() {
     setError('')
 
     try {
-      const updatedRequest = await updateProcessorRequestStatus(request.id, nextStatus)
+      const updatedRequest = await updateProcessorRequestStatus(request.id, nextStatus, note)
 
       if (!updatedRequest) {
         setError('De aanvraag kon niet worden bijgewerkt.')
@@ -123,7 +123,13 @@ export function ProcessRequestPage() {
             </div>
             <div>
               <p className="text-sm text-slate-400">Draaidag</p>
-              <p className="mt-2 text-base text-white">{request.shootDate}</p>
+              <p className="mt-2 text-base text-white">{request.requestDate}</p>
+            </div>
+            <div>
+              <p className="text-sm text-slate-400">Tijdslot</p>
+              <p className="mt-2 text-base text-white">
+                {request.startTime} - {request.endTime}
+              </p>
             </div>
             <div>
               <p className="text-sm text-slate-400">Retourdatum</p>
@@ -185,10 +191,42 @@ export function ProcessRequestPage() {
               >
                 Zet terug naar pending
               </Button>
+              <Button
+                variant="danger"
+                disabled={isUpdating}
+                onClick={() => handleStatusChange('rejected', 'Afgekeurd door verwerker')}
+              >
+                Afkeuren
+              </Button>
+              <Button
+                disabled={isUpdating}
+                onClick={() => handleStatusChange('returned', 'Retour volledig geregistreerd')}
+                className="bg-lime-600 hover:bg-lime-500"
+              >
+                Retour registreren
+              </Button>
             </div>
           </section>
         </aside>
       </div>
+
+      <section className="card-surface p-5">
+        <h2 className="text-lg font-semibold text-white">Status timeline</h2>
+        <div className="mt-5 space-y-4">
+          {request.timeline.map((entry) => (
+            <div key={entry.id} className="flex gap-4">
+              <div className="mt-1 h-3 w-3 rounded-full bg-brand-500" />
+              <div>
+                <p className="text-sm font-medium text-white">{entry.label}</p>
+                <p className="mt-1 text-sm text-slate-400">
+                  {new Date(entry.timestamp).toLocaleString('nl-NL')} · {entry.actor}
+                </p>
+                {entry.note ? <p className="mt-1 text-sm text-slate-300">{entry.note}</p> : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   )
 }

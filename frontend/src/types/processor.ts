@@ -1,5 +1,14 @@
-export type ProcessorRequestStatus = 'pending' | 'approved' | 'in_use'
+export type ProcessorRequestStatus = 'pending' | 'approved' | 'rejected' | 'in_use' | 'returned'
 export type ProcessorPriority = 'low' | 'medium' | 'high'
+
+export interface ProcessorTimelineEntry {
+  id: string
+  status: ProcessorRequestStatus
+  label: string
+  timestamp: string
+  actor: string
+  note?: string
+}
 
 export interface ProcessorRequest {
   id: string
@@ -8,12 +17,16 @@ export interface ProcessorRequest {
   department: string
   status: ProcessorRequestStatus
   priority: ProcessorPriority
-  shootDate: string
+  activityType: string
+  requestDate: string
+  startTime: string
+  endTime: string
   returnDate: string
   location: string
   submittedAt: string
   requestedItems: string[]
   notes: string
+  timeline: ProcessorTimelineEntry[]
 }
 
 export interface ProcessorOverview {
@@ -21,4 +34,5 @@ export interface ProcessorOverview {
   pendingRequests: number
   approvedRequests: number
   inUseRequests: number
+  returnedRequests: number
 }

@@ -117,9 +117,9 @@ export function RequesterDashboardPage() {
                   <StatusBadge value={request.status} />
                 </div>
                 <div className="mt-4 grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
-                  <p>Opname: {request.shootDate}</p>
+                  <p>Datum: {request.requestDate}</p>
                   <p>Locatie: {request.location}</p>
-                  <p>Prioriteit: {request.priority}</p>
+                  <p>Activiteit: {request.activityType}</p>
                 </div>
               </Link>
             ))}

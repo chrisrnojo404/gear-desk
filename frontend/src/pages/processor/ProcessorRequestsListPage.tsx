@@ -33,6 +33,16 @@ const copy = {
     title: 'Apparatuur die momenteel buiten staat',
     description: 'Monitor welke sets in gebruik zijn en wanneer retour verwacht wordt.',
   },
+  rejected: {
+    eyebrow: 'Afgekeurde aanvragen',
+    title: 'Aanvragen die zijn afgekeurd',
+    description: 'Overzicht van aanvragen die niet zijn goedgekeurd en opvolging nodig hebben.',
+  },
+  returned: {
+    eyebrow: 'Retour registraties',
+    title: 'Aanvragen die retour zijn geboekt',
+    description: 'Gebruik deze lijst om afgeronde opdrachten en teruggebrachte sets te volgen.',
+  },
 } as const
 
 export function ProcessorRequestsListPage({ mode }: ProcessorRequestsListPageProps) {

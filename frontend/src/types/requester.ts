@@ -1,19 +1,40 @@
-export type RequestStatus = 'draft' | 'submitted' | 'approved' | 'in_review' | 'rejected'
+export type RequestStatus =
+  | 'draft'
+  | 'submitted'
+  | 'approved'
+  | 'in_review'
+  | 'rejected'
+  | 'in_use'
+  | 'returned'
 export type RequestPriority = 'low' | 'medium' | 'high'
 export type EquipmentCategory = 'camera' | 'audio' | 'lighting' | 'accessories'
+export type ActivityType = 'studio' | 'reportage' | 'podcast' | 'event' | 'livestream'
+
+export interface StatusTimelineEntry {
+  id: string
+  status: RequestStatus
+  label: string
+  timestamp: string
+  actor: string
+  note?: string
+}
 
 export interface RequestItem {
   id: string
   title: string
   status: RequestStatus
+  activityType: ActivityType
   priority: RequestPriority
-  shootDate: string
+  requestDate: string
+  startTime: string
+  endTime: string
   returnDate: string
   location: string
   purpose: string
   submittedAt: string
   requestedItems: string[]
   notes: string
+  timeline: StatusTimelineEntry[]
 }
 
 export interface EquipmentItem {
@@ -34,11 +55,14 @@ export interface RequesterOverview {
 
 export interface NewRequestFormValues {
   title: string
-  purpose: string
+  activityType: ActivityType
+  requestDate: string
+  startTime: string
+  endTime: string
   location: string
-  shootDate: string
+  purpose: string
   returnDate: string
   priority: RequestPriority
-  requestedItems: string
+  requestedItems: string[]
   notes: string
 }

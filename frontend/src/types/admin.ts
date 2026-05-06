@@ -23,8 +23,22 @@ export interface AdminEquipmentItem {
   location: string
 }
 
+export interface AdminEquipmentFormValues {
+  name: string
+  category: string
+  status: AdminEquipmentItem['status']
+  serialNumber: string
+  location: string
+}
+
 export interface AdminCategory {
   id: string
+  name: string
+  itemCount: number
+  accessLevel: string
+}
+
+export interface AdminCategoryFormValues {
   name: string
   itemCount: number
   accessLevel: string

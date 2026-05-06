@@ -1,29 +1,79 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { FormInput } from '../../components/auth/FormInput'
 import { PageHeader } from '../../components/dashboard/PageHeader'
 import { Button } from '../../components/ui/Button'
 import { FormSelect } from '../../components/ui/FormSelect'
 import { FormTextarea } from '../../components/ui/FormTextarea'
-import { createRequest } from '../../services/mock/requesterService'
+import { createRequest, getAvailableEquipment } from '../../services/mock/requesterService'
 import type { NewRequestFormValues } from '../../types/requester'
+import { useEffect } from 'react'
+
+const activityTypes = [
+  { value: 'studio', label: 'Studio opname' },
+  { value: 'reportage', label: 'Reportage' },
+  { value: 'podcast', label: 'Podcast' },
+  { value: 'event', label: 'Event' },
+  { value: 'livestream', label: 'Livestream' },
+] as const
 
 export function NewRequestPage() {
   const navigate = useNavigate()
   const [submitError, setSubmitError] = useState('')
   const [isSubmittingForm, setIsSubmittingForm] = useState(false)
+  const [equipmentOptions, setEquipmentOptions] = useState<Array<{ id: string; name: string }>>([])
   const {
+    control,
     register,
     handleSubmit,
+    setValue,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<NewRequestFormValues>({
     defaultValues: {
+      activityType: 'studio',
       priority: 'medium',
+      requestedItems: [],
     },
   })
 
+  const selectedItems = useWatch({
+    control,
+    name: 'requestedItems',
+  }) ?? []
+
+  useEffect(() => {
+    async function loadOptions() {
+      const equipment = await getAvailableEquipment()
+      setEquipmentOptions(equipment.map((item) => ({ id: item.id, name: item.name })))
+    }
+
+    void loadOptions()
+  }, [])
+
+  const toggleEquipmentItem = (name: string) => {
+    const current = selectedItems ?? []
+    const next = current.includes(name)
+      ? current.filter((item) => item !== name)
+      : [...current, name]
+
+    setValue('requestedItems', next, { shouldDirty: true, shouldValidate: true })
+    if (next.length > 0) {
+      clearErrors('requestedItems')
+    }
+  }
+
   const onSubmit = handleSubmit(async (values) => {
+    if (!values.requestedItems.length) {
+      setError('requestedItems', {
+        type: 'manual',
+        message: 'Selecteer minstens een apparaat.',
+      })
+      return
+    }
+
     setSubmitError('')
     setIsSubmittingForm(true)
 
@@ -67,9 +117,24 @@ export function NewRequestPage() {
               />
             </div>
 
+            <FormSelect
+              id="activityType"
+              label="Activiteit type"
+              error={errors.activityType}
+              {...register('activityType', {
+                required: 'Activiteit type is verplicht.',
+              })}
+            >
+              {activityTypes.map((activity) => (
+                <option key={activity.value} value={activity.value} className="text-slate-900">
+                  {activity.label}
+                </option>
+              ))}
+            </FormSelect>
+
             <FormInput
               id="location"
-              label="Locatie"
+              label="Plaats"
               placeholder="Studio A of buitenlocatie"
               error={errors.location}
               {...register('location', {
@@ -97,12 +162,32 @@ export function NewRequestPage() {
             </FormSelect>
 
             <FormInput
-              id="shootDate"
+              id="requestDate"
               type="date"
-              label="Opnamedatum"
-              error={errors.shootDate}
-              {...register('shootDate', {
-                required: 'Opnamedatum is verplicht.',
+              label="Datum"
+              error={errors.requestDate}
+              {...register('requestDate', {
+                required: 'Datum is verplicht.',
+              })}
+            />
+
+            <FormInput
+              id="startTime"
+              type="time"
+              label="Starttijd"
+              error={errors.startTime}
+              {...register('startTime', {
+                required: 'Starttijd is verplicht.',
+              })}
+            />
+
+            <FormInput
+              id="endTime"
+              type="time"
+              label="Eindtijd"
+              error={errors.endTime}
+              {...register('endTime', {
+                required: 'Eindtijd is verplicht.',
               })}
             />
 
@@ -120,30 +205,40 @@ export function NewRequestPage() {
               <FormTextarea
                 id="purpose"
                 rows={4}
-                label="Doel van de productie"
-                placeholder="Omschrijf kort waar de apparatuur voor nodig is"
+                label="Omschrijving"
+                placeholder="Omschrijf kort de activiteit en wat er nodig is"
                 error={errors.purpose}
                 {...register('purpose', {
-                  required: 'Doel van de productie is verplicht.',
+                  required: 'Omschrijving is verplicht.',
                   minLength: {
                     value: 12,
-                    message: 'Omschrijf het doel iets uitgebreider.',
+                    message: 'Omschrijf de activiteit iets uitgebreider.',
                   },
                 })}
               />
             </div>
 
             <div className="md:col-span-2">
-              <FormTextarea
-                id="requestedItems"
-                rows={3}
-                label="Gewenste apparatuur"
-                placeholder="Bijv. Sony FX3, Rode Wireless GO II, Aputure 300D"
-                error={errors.requestedItems}
-                {...register('requestedItems', {
-                  required: 'Voer minstens een apparaat in.',
-                })}
-              />
+              <div className="mb-2 text-sm font-medium text-slate-200">Apparatuur selectie</div>
+              <div className="grid gap-3 md:grid-cols-2">
+                {equipmentOptions.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => toggleEquipmentItem(item.name)}
+                    className={`rounded-2xl border px-4 py-3 text-left text-sm transition ${
+                      selectedItems?.includes(item.name)
+                        ? 'border-brand-400 bg-brand-500/15 text-white'
+                        : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/8'
+                    }`}
+                  >
+                    {item.name}
+                  </button>
+                ))}
+              </div>
+              {errors.requestedItems ? (
+                <p className="mt-2 text-sm text-rose-300">{errors.requestedItems.message}</p>
+              ) : null}
             </div>
 
             <div className="md:col-span-2">

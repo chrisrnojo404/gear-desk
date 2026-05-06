@@ -69,6 +69,7 @@ export function ProcessorDashboardPage() {
         <StatCard label="Pending" value={overview.pendingRequests} helper="Wachten op beoordeling of voorbereiding" />
         <StatCard label="Goedgekeurd" value={overview.approvedRequests} helper="Klaar voor uitgifte of pick-up" />
         <StatCard label="In gebruik" value={overview.inUseRequests} helper="Momenteel buiten het magazijn" />
+        <StatCard label="Retour" value={overview.returnedRequests} helper="Afgerond en retour geboekt" />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
@@ -102,7 +103,7 @@ export function ProcessorDashboardPage() {
                 <div className="mt-4 grid gap-2 text-sm text-slate-300 sm:grid-cols-3">
                   <p>Aanvrager: {request.requesterName}</p>
                   <p>Locatie: {request.location}</p>
-                  <p>Draaidag: {request.shootDate}</p>
+                  <p>Datum: {request.requestDate}</p>
                 </div>
               </div>
             ))}

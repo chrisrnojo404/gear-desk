@@ -18,6 +18,7 @@ const badgeMap: Record<BadgeVariant, string> = {
   pending: 'border-amber-400/30 bg-amber-500/15 text-amber-100',
   rejected: 'border-rose-400/30 bg-rose-500/15 text-rose-100',
   reserved: 'border-sky-400/30 bg-sky-500/15 text-sky-100',
+  returned: 'border-lime-400/30 bg-lime-500/15 text-lime-100',
   submitted: 'border-sky-400/30 bg-sky-500/15 text-sky-100',
 }
 

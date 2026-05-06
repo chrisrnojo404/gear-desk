@@ -2,7 +2,35 @@ import type {
   ProcessorOverview,
   ProcessorRequest,
   ProcessorRequestStatus,
+  ProcessorTimelineEntry,
 } from '../../types/processor'
+
+function appendTimeline(
+  request: ProcessorRequest,
+  status: ProcessorRequestStatus,
+  actor = 'Rens Martina',
+  note?: string,
+): ProcessorTimelineEntry[] {
+  const labelMap: Record<ProcessorRequestStatus, string> = {
+    pending: 'Aanvraag staat in behandeling',
+    approved: 'Aanvraag goedgekeurd',
+    rejected: 'Aanvraag afgekeurd',
+    in_use: 'Apparatuur uitgegeven',
+    returned: 'Retour geregistreerd',
+  }
+
+  return [
+    ...request.timeline,
+    {
+      id: `tl-${request.timeline.length + 1}`,
+      status,
+      label: labelMap[status],
+      timestamp: new Date().toISOString(),
+      actor,
+      note,
+    },
+  ]
+}
 
 let processorRequests: ProcessorRequest[] = [
   {
@@ -12,12 +40,24 @@ let processorRequests: ProcessorRequest[] = [
     department: 'Nieuws',
     status: 'pending',
     priority: 'high',
-    shootDate: '2026-05-07',
+    activityType: 'reportage',
+    requestDate: '2026-05-07',
+    startTime: '08:00',
+    endTime: '12:00',
     returnDate: '2026-05-07',
     location: 'Waterkant',
     submittedAt: '2026-05-05T10:15:00Z',
     requestedItems: ['Sony FX3', 'Wireless lav set', 'Tripod kit'],
     notes: 'Reporter vertrekt om 08:00, pickup liefst 07:15.',
+    timeline: [
+      {
+        id: 'tl-1',
+        status: 'pending',
+        label: 'Aanvraag ontvangen',
+        timestamp: '2026-05-05T10:15:00Z',
+        actor: 'Systeem',
+      },
+    ],
   },
   {
     id: 'REQ-2001',
@@ -26,12 +66,31 @@ let processorRequests: ProcessorRequest[] = [
     department: 'Productie',
     status: 'approved',
     priority: 'medium',
-    shootDate: '2026-05-08',
+    activityType: 'studio',
+    requestDate: '2026-05-08',
+    startTime: '09:00',
+    endTime: '12:00',
     returnDate: '2026-05-08',
     location: 'Studio B',
     submittedAt: '2026-05-04T08:45:00Z',
     requestedItems: ['Canon C70', 'Aputure 300D', 'Audio mixer'],
     notes: 'Set mag de avond ervoor klaargezet worden.',
+    timeline: [
+      {
+        id: 'tl-1',
+        status: 'pending',
+        label: 'Aanvraag ontvangen',
+        timestamp: '2026-05-04T08:45:00Z',
+        actor: 'Systeem',
+      },
+      {
+        id: 'tl-2',
+        status: 'approved',
+        label: 'Aanvraag goedgekeurd',
+        timestamp: '2026-05-04T11:00:00Z',
+        actor: 'Rens Martina',
+      },
+    ],
   },
   {
     id: 'REQ-1998',
@@ -40,12 +99,38 @@ let processorRequests: ProcessorRequest[] = [
     department: 'Digital',
     status: 'in_use',
     priority: 'low',
-    shootDate: '2026-05-06',
+    activityType: 'podcast',
+    requestDate: '2026-05-06',
+    startTime: '13:00',
+    endTime: '17:00',
     returnDate: '2026-05-06',
     location: 'Podcast studio',
     submittedAt: '2026-05-03T15:20:00Z',
     requestedItems: ['Shure SM7B', 'Zoom PodTrak P4', 'Softbox set'],
     notes: 'Retour verwacht eind van de middag.',
+    timeline: [
+      {
+        id: 'tl-1',
+        status: 'pending',
+        label: 'Aanvraag ontvangen',
+        timestamp: '2026-05-03T15:20:00Z',
+        actor: 'Systeem',
+      },
+      {
+        id: 'tl-2',
+        status: 'approved',
+        label: 'Aanvraag goedgekeurd',
+        timestamp: '2026-05-04T09:00:00Z',
+        actor: 'Rens Martina',
+      },
+      {
+        id: 'tl-3',
+        status: 'in_use',
+        label: 'Apparatuur uitgegeven',
+        timestamp: '2026-05-06T12:45:00Z',
+        actor: 'Rens Martina',
+      },
+    ],
   },
   {
     id: 'REQ-1994',
@@ -54,12 +139,24 @@ let processorRequests: ProcessorRequest[] = [
     department: 'Events',
     status: 'pending',
     priority: 'high',
-    shootDate: '2026-05-09',
+    activityType: 'event',
+    requestDate: '2026-05-09',
+    startTime: '18:00',
+    endTime: '23:30',
     returnDate: '2026-05-10',
     location: 'Amfitheater',
     submittedAt: '2026-05-02T11:05:00Z',
     requestedItems: ['Sony FX6', 'Field recorder', 'Battery kit'],
     notes: 'Extra regenbescherming gewenst.',
+    timeline: [
+      {
+        id: 'tl-1',
+        status: 'pending',
+        label: 'Aanvraag ontvangen',
+        timestamp: '2026-05-02T11:05:00Z',
+        actor: 'Systeem',
+      },
+    ],
   },
 ]
 
@@ -77,6 +174,7 @@ export async function getProcessorOverview(): Promise<ProcessorOverview> {
     pendingRequests: processorRequests.filter((request) => request.status === 'pending').length,
     approvedRequests: processorRequests.filter((request) => request.status === 'approved').length,
     inUseRequests: processorRequests.filter((request) => request.status === 'in_use').length,
+    returnedRequests: processorRequests.filter((request) => request.status === 'returned').length,
   }
 }
 
@@ -98,11 +196,14 @@ export async function getProcessorRequestById(id: string) {
 export async function updateProcessorRequestStatus(
   id: string,
   status: ProcessorRequestStatus,
+  note?: string,
 ) {
   await delay(400)
 
   processorRequests = processorRequests.map((request) =>
-    request.id === id ? { ...request, status } : request,
+    request.id === id
+      ? { ...request, status, timeline: appendTimeline(request, status, 'Rens Martina', note) }
+      : request,
   )
 
   return processorRequests.find((request) => request.id === id) ?? null

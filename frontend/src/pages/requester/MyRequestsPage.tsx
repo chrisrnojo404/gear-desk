@@ -26,9 +26,9 @@ const columns: DataTableColumn<RequestItem>[] = [
     render: (request) => <p className="text-sm text-slate-300">{request.location}</p>,
   },
   {
-    key: 'shootDate',
-    header: 'Opnamedatum',
-    render: (request) => <p className="text-sm text-slate-300">{request.shootDate}</p>,
+    key: 'requestDate',
+    header: 'Datum',
+    render: (request) => <p className="text-sm text-slate-300">{request.requestDate}</p>,
   },
   {
     key: 'status',

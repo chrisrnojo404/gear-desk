@@ -35,9 +35,9 @@ const columns: DataTableColumn<ProcessorRequest>[] = [
     render: (request) => <StatusBadge value={request.status} />,
   },
   {
-    key: 'shootDate',
-    header: 'Draaidag',
-    render: (request) => <p className="text-sm text-slate-300">{request.shootDate}</p>,
+    key: 'requestDate',
+    header: 'Datum',
+    render: (request) => <p className="text-sm text-slate-300">{request.requestDate}</p>,
   },
   {
     key: 'actions',
