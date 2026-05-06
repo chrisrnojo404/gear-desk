@@ -7,9 +7,10 @@ import type {
   AdminOverview,
   AdminReport,
   AdminUser,
+  AdminUserFormValues,
 } from '../../types/admin'
 
-const adminUsers: AdminUser[] = [
+let adminUsers: AdminUser[] = [
   {
     id: 1,
     name: 'Naomi Kandhai',
@@ -49,6 +50,8 @@ let adminEquipment: AdminEquipmentItem[] = [
     id: 'EQ-301',
     name: 'Sony FX6',
     category: 'Camera',
+    condition: 'good',
+    quantity: 4,
     status: 'available',
     serialNumber: 'FX6-00912',
     location: 'Magazijn 1',
@@ -57,6 +60,8 @@ let adminEquipment: AdminEquipmentItem[] = [
     id: 'EQ-302',
     name: 'Zoom F6 Recorder',
     category: 'Audio',
+    condition: 'new',
+    quantity: 2,
     status: 'in_use',
     serialNumber: 'ZF6-11032',
     location: 'Uitgegeven',
@@ -65,6 +70,8 @@ let adminEquipment: AdminEquipmentItem[] = [
     id: 'EQ-303',
     name: 'Aputure Nova P300c',
     category: 'Lighting',
+    condition: 'maintenance',
+    quantity: 1,
     status: 'defect',
     serialNumber: 'ANP-44321',
     location: 'Technische dienst',
@@ -73,9 +80,51 @@ let adminEquipment: AdminEquipmentItem[] = [
     id: 'EQ-304',
     name: 'Sachtler Flowtech Tripod',
     category: 'Accessories',
+    condition: 'fair',
+    quantity: 6,
     status: 'reserved',
     serialNumber: 'SFT-88210',
     location: 'Accessoirewand',
+  },
+  {
+    id: 'EQ-305',
+    name: 'Blackmagic Studio Camera 4K',
+    category: 'Camera',
+    condition: 'good',
+    quantity: 3,
+    status: 'available',
+    serialNumber: 'BSC-22451',
+    location: 'Magazijn 2',
+  },
+  {
+    id: 'EQ-306',
+    name: 'Shure SM7B',
+    category: 'Audio',
+    condition: 'fair',
+    quantity: 8,
+    status: 'available',
+    serialNumber: 'SM7-78124',
+    location: 'Audiorek',
+  },
+  {
+    id: 'EQ-307',
+    name: 'Nanlite Forza 300',
+    category: 'Lighting',
+    condition: 'good',
+    quantity: 5,
+    status: 'reserved',
+    serialNumber: 'NF3-33109',
+    location: 'Lichtopslag',
+  },
+  {
+    id: 'EQ-308',
+    name: 'DJI RS 3 Pro',
+    category: 'Accessories',
+    condition: 'new',
+    quantity: 2,
+    status: 'in_use',
+    serialNumber: 'RS3-65018',
+    location: 'Uitgegeven',
   },
 ]
 
@@ -165,6 +214,27 @@ export async function getAdminOverview(): Promise<AdminOverview> {
 export async function getAdminUsers() {
   await delay()
   return [...adminUsers]
+}
+
+export async function createAdminUser(values: AdminUserFormValues) {
+  await delay()
+  const user: AdminUser = {
+    id: Math.max(0, ...adminUsers.map((item) => item.id)) + 1,
+    ...values,
+  }
+  adminUsers.unshift(user)
+  return user
+}
+
+export async function updateAdminUser(id: number, values: AdminUserFormValues) {
+  await delay()
+  adminUsers = adminUsers.map((user) => (user.id === id ? { ...user, ...values } : user))
+  return adminUsers.find((user) => user.id === id) ?? null
+}
+
+export async function deleteAdminUser(id: number) {
+  await delay()
+  adminUsers = adminUsers.filter((user) => user.id !== id)
 }
 
 export async function getAdminEquipment() {

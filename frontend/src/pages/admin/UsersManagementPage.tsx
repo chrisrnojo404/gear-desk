@@ -1,12 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { LoadingScreen } from '../../components/common/LoadingScreen'
 import { RoleBadge } from '../../components/common/RoleBadge'
 import { PageHeader } from '../../components/dashboard/PageHeader'
 import { DataTable, type DataTableColumn } from '../../components/ui/DataTable'
 import { Button } from '../../components/ui/Button'
+import { FormInput } from '../../components/auth/FormInput'
+import { FormSelect } from '../../components/ui/FormSelect'
 import { Modal } from '../../components/ui/Modal'
-import { getAdminUsers } from '../../services/mock/adminService'
-import type { AdminUser } from '../../types/admin'
+import {
+  createAdminUser,
+  deleteAdminUser,
+  getAdminUsers,
+  updateAdminUser,
+} from '../../services/mock/adminService'
+import type { AdminUser, AdminUserFormValues } from '../../types/admin'
 
 function statusClass(status: AdminUser['status']) {
   switch (status) {
@@ -22,25 +30,89 @@ function statusClass(status: AdminUser['status']) {
 export function UsersManagementPage() {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    async function loadUsers() {
-      setIsLoading(true)
-      setError('')
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<AdminUserFormValues>({
+    defaultValues: {
+      name: '',
+      email: '',
+      role: 'level_1',
+      status: 'active',
+      department: '',
+    },
+  })
 
-      try {
-        setUsers(await getAdminUsers())
-      } catch {
-        setError('Gebruikers konden niet worden geladen.')
-      } finally {
-        setIsLoading(false)
-      }
+  async function loadUsers() {
+    setIsLoading(true)
+    setError('')
+
+    try {
+      setUsers(await getAdminUsers())
+    } catch {
+      setError('Gebruikers konden niet worden geladen.')
+    } finally {
+      setIsLoading(false)
     }
+  }
 
+  useEffect(() => {
     void loadUsers()
   }, [])
+
+  const openCreate = () => {
+    reset({
+      name: '',
+      email: '',
+      role: 'level_1',
+      status: 'active',
+      department: '',
+    })
+    setSelectedUser(null)
+    setIsModalOpen(true)
+  }
+
+  const openEdit = (user: AdminUser) => {
+    reset({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+      department: user.department,
+    })
+    setSelectedUser(user)
+    setIsModalOpen(true)
+  }
+
+  const handleDelete = async (user: AdminUser) => {
+    await deleteAdminUser(user.id)
+    await loadUsers()
+  }
+
+  const onSubmit = handleSubmit(async (values) => {
+    setIsSaving(true)
+
+    try {
+      if (selectedUser) {
+        await updateAdminUser(selectedUser.id, values)
+      } else {
+        await createAdminUser(values)
+      }
+
+      setIsModalOpen(false)
+      setSelectedUser(null)
+      await loadUsers()
+    } finally {
+      setIsSaving(false)
+    }
+  })
 
   const columns = useMemo<DataTableColumn<AdminUser>[]>(
     () => [
@@ -77,11 +149,16 @@ export function UsersManagementPage() {
       },
       {
         key: 'action',
-        header: 'Actie',
+        header: 'Acties',
         render: (user) => (
-          <Button variant="secondary" size="sm" onClick={() => setSelectedUser(user)}>
-            Bekijk
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="secondary" size="sm" onClick={() => openEdit(user)}>
+              Bewerken
+            </Button>
+            <Button variant="danger" size="sm" onClick={() => void handleDelete(user)}>
+              Verwijderen
+            </Button>
+          </div>
         ),
       },
     ],
@@ -98,6 +175,11 @@ export function UsersManagementPage() {
         eyebrow="Gebruikersbeheer"
         title="Accounts, rollen en toegangsstatus"
         description="Beheer wie toegang heeft tot het systeem en welke verantwoordelijkheden aan elk account gekoppeld zijn."
+        actions={
+          <Button onClick={openCreate}>
+            Gebruiker toevoegen
+          </Button>
+        }
       />
 
       {error ? (
@@ -114,44 +196,63 @@ export function UsersManagementPage() {
       )}
 
       <Modal
-        open={Boolean(selectedUser)}
-        onClose={() => setSelectedUser(null)}
-        title={selectedUser?.name ?? ''}
-        description="Voorbeeld van een herbruikbare modal voor accountbeheer."
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={selectedUser ? 'Gebruiker bewerken' : 'Nieuwe gebruiker'}
         footer={
-          <Button variant="secondary" onClick={() => setSelectedUser(null)}>
-            Sluiten
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
+              Annuleren
+            </Button>
+            <Button type="submit" form="user-form" disabled={isSaving}>
+              {isSaving ? 'Opslaan...' : 'Opslaan'}
+            </Button>
+          </>
         }
       >
-        {selectedUser ? (
-          <div className="grid gap-4 text-sm text-slate-300 sm:grid-cols-2">
-            <div>
-              <p className="text-slate-400">E-mail</p>
-              <p className="mt-2 text-white">{selectedUser.email}</p>
-            </div>
-            <div>
-              <p className="text-slate-400">Afdeling</p>
-              <p className="mt-2 text-white">{selectedUser.department}</p>
-            </div>
-            <div>
-              <p className="text-slate-400">Rol</p>
-              <div className="mt-2">
-                <RoleBadge role={selectedUser.role} />
-              </div>
-            </div>
-            <div>
-              <p className="text-slate-400">Status</p>
-              <div className="mt-2">
-                <span
-                  className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.14em] uppercase ${statusClass(selectedUser.status)}`}
-                >
-                  {selectedUser.status}
-                </span>
-              </div>
-            </div>
+        <form id="user-form" onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
+          <FormInput
+            id="user-name"
+            label="Naam"
+            error={errors.name}
+            {...register('name', { required: 'Naam is verplicht.' })}
+          />
+          <FormInput
+            id="user-email"
+            label="E-mail"
+            type="email"
+            error={errors.email}
+            {...register('email', { required: 'E-mail is verplicht.' })}
+          />
+          <FormInput
+            id="user-department"
+            label="Afdeling"
+            error={errors.department}
+            {...register('department', { required: 'Afdeling is verplicht.' })}
+          />
+          <FormSelect
+            id="user-role"
+            label="Rol"
+            error={errors.role}
+            {...register('role', { required: 'Rol is verplicht.' })}
+          >
+            <option value="level_1" className="text-slate-900">Level 1 - Aanvrager</option>
+            <option value="level_2" className="text-slate-900">Level 2 - Verwerker</option>
+            <option value="level_3" className="text-slate-900">Level 3 - Admin</option>
+          </FormSelect>
+          <div className="md:col-span-2">
+            <FormSelect
+              id="user-status"
+              label="Status"
+              error={errors.status}
+              {...register('status', { required: 'Status is verplicht.' })}
+            >
+              <option value="active" className="text-slate-900">Active</option>
+              <option value="pending" className="text-slate-900">Pending</option>
+              <option value="blocked" className="text-slate-900">Blocked</option>
+            </FormSelect>
           </div>
-        ) : null}
+        </form>
       </Modal>
     </div>
   )

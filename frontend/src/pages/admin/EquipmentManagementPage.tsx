@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { LoadingScreen } from '../../components/common/LoadingScreen'
 import { PageHeader } from '../../components/dashboard/PageHeader'
-import { StatusBadge } from '../../components/dashboard/StatusBadge'
 import { DataTable, type DataTableColumn } from '../../components/ui/DataTable'
 import { Button } from '../../components/ui/Button'
 import { FormInput } from '../../components/auth/FormInput'
@@ -33,9 +32,11 @@ export function EquipmentManagementPage() {
     defaultValues: {
       name: '',
       category: 'Camera',
+      condition: 'good',
+      quantity: 1,
       status: 'available',
       serialNumber: '',
-      location: '',
+      location: 'Magazijn 1',
     },
   })
 
@@ -85,9 +86,11 @@ export function EquipmentManagementPage() {
     reset({
       name: '',
       category: 'Camera',
+      condition: 'good',
+      quantity: 1,
       status: 'available',
       serialNumber: '',
-      location: '',
+      location: 'Magazijn 1',
     })
     setSelectedItem(null)
     setIsCreateOpen(true)
@@ -97,6 +100,8 @@ export function EquipmentManagementPage() {
     reset({
       name: item.name,
       category: item.category,
+      condition: item.condition,
+      quantity: item.quantity,
       status: item.status,
       serialNumber: item.serialNumber,
       location: item.location,
@@ -140,24 +145,33 @@ export function EquipmentManagementPage() {
       ),
     },
     {
-      key: 'category',
-      header: 'Categorie',
-      render: (item) => <p className="text-sm text-slate-300">{item.category}</p>,
-    },
-    {
-      key: 'status',
-      header: 'Status',
-      render: (item) => <StatusBadge value={item.status} />,
-    },
-    {
       key: 'serial',
       header: 'Serienummer',
       render: (item) => <p className="text-sm text-slate-300">{item.serialNumber}</p>,
     },
     {
-      key: 'location',
-      header: 'Locatie',
-      render: (item) => <p className="text-sm text-slate-300">{item.location}</p>,
+      key: 'category',
+      header: 'Categorie',
+      render: (item) => <p className="text-sm text-slate-300">{item.category}</p>,
+    },
+    {
+      key: 'quantity',
+      header: 'Aantal',
+      render: (item) => <p className="text-sm text-slate-300">{item.quantity}</p>,
+    },
+    {
+      key: 'condition',
+      header: 'Conditie',
+      render: (item) => (
+        <p className="text-sm text-slate-300">
+          {{
+            new: 'Nieuw',
+            good: 'Goed',
+            fair: 'Redelijk',
+            maintenance: 'Onderhoud nodig',
+          }[item.condition]}
+        </p>
+      ),
     },
     {
       key: 'actions',
@@ -183,8 +197,8 @@ export function EquipmentManagementPage() {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Apparatuurbeheer"
-        title="Assets, serienummers en status"
-        description="Houd centraal bij waar apparatuur zich bevindt en of onderhoud of inzet actie vereist."
+        title="Assets, conditie en aantallen"
+        description="Beheer centraal welke apparatuur er is, in welke staat die verkeert en hoeveel stuks beschikbaar zijn."
         actions={
           <Button onClick={openCreate}>
             Apparatuur toevoegen
@@ -239,25 +253,30 @@ export function EquipmentManagementPage() {
             error={errors.category}
             {...register('category', { required: 'Categorie is verplicht.' })}
           />
+          <FormSelect
+            id="equipment-condition"
+            label="Conditie"
+            error={errors.condition}
+            {...register('condition', { required: 'Conditie is verplicht.' })}
+          >
+            <option value="new" className="text-slate-900">Nieuw</option>
+            <option value="good" className="text-slate-900">Goed</option>
+            <option value="fair" className="text-slate-900">Redelijk</option>
+            <option value="maintenance" className="text-slate-900">Onderhoud nodig</option>
+          </FormSelect>
           <FormInput
-            id="equipment-location"
-            label="Locatie"
-            error={errors.location}
-            {...register('location', { required: 'Locatie is verplicht.' })}
+            id="equipment-quantity"
+            type="number"
+            label="Aantal"
+            error={errors.quantity}
+            {...register('quantity', {
+              required: 'Aantal is verplicht.',
+              valueAsNumber: true,
+              min: { value: 1, message: 'Aantal moet minimaal 1 zijn.' },
+            })}
           />
-          <div className="md:col-span-2">
-            <FormSelect
-              id="equipment-status"
-              label="Status"
-              error={errors.status}
-              {...register('status', { required: 'Status is verplicht.' })}
-            >
-              <option value="available" className="text-slate-900">Beschikbaar</option>
-              <option value="reserved" className="text-slate-900">Gereserveerd</option>
-              <option value="in_use" className="text-slate-900">In gebruik</option>
-              <option value="defect" className="text-slate-900">Defect</option>
-            </FormSelect>
-          </div>
+          <input type="hidden" {...register('location', { required: true })} />
+          <input type="hidden" {...register('status', { required: true })} />
         </form>
       </Modal>
     </div>

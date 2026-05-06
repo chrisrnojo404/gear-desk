@@ -14,6 +14,7 @@ import { LoginPage } from '../pages/auth/LoginPage'
 import { PrintPage } from '../pages/processor/PrintPage'
 import { ProcessRequestPage } from '../pages/processor/ProcessRequestPage'
 import { ProcessorDashboardPage } from '../pages/processor/ProcessorDashboardPage'
+import { ProcessorEquipmentPage } from '../pages/processor/ProcessorEquipmentPage'
 import { ProcessorRequestsListPage } from '../pages/processor/ProcessorRequestsListPage'
 import { AvailableEquipmentPage } from '../pages/requester/AvailableEquipmentPage'
 import { MyRequestsPage } from '../pages/requester/MyRequestsPage'
@@ -90,6 +91,7 @@ export function AppRouter() {
               path="in-use"
               element={<ProcessorRequestsListPage mode="in_use" />}
             />
+            <Route path="equipment" element={<ProcessorEquipmentPage />} />
             <Route
               path="requests/:requestId/process"
               element={<ProcessRequestPage />}

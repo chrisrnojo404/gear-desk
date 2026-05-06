@@ -3,6 +3,7 @@ import {
   ClipboardCheck,
   Clock3,
   LayoutDashboard,
+  PackageSearch,
   RadioTower,
 } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
@@ -15,6 +16,7 @@ const navigationItems = [
   { to: '/dashboard/processor/pending', label: 'Pending aanvragen', icon: Clock3 },
   { to: '/dashboard/processor/approved', label: 'Goedgekeurde aanvragen', icon: CheckCheck },
   { to: '/dashboard/processor/in-use', label: 'In gebruik aanvragen', icon: RadioTower },
+  { to: '/dashboard/processor/equipment', label: 'Apparatuur overzicht', icon: PackageSearch },
 ]
 
 export function ProcessorLayout() {

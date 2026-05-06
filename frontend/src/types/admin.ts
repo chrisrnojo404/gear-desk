@@ -14,10 +14,20 @@ export interface AdminUser {
   department: string
 }
 
+export interface AdminUserFormValues {
+  name: string
+  email: string
+  role: AdminUser['role']
+  status: AdminUser['status']
+  department: string
+}
+
 export interface AdminEquipmentItem {
   id: string
   name: string
   category: string
+  condition: 'new' | 'good' | 'fair' | 'maintenance'
+  quantity: number
   status: 'available' | 'reserved' | 'in_use' | 'defect'
   serialNumber: string
   location: string
@@ -26,6 +36,8 @@ export interface AdminEquipmentItem {
 export interface AdminEquipmentFormValues {
   name: string
   category: string
+  condition: AdminEquipmentItem['condition']
+  quantity: number
   status: AdminEquipmentItem['status']
   serialNumber: string
   location: string

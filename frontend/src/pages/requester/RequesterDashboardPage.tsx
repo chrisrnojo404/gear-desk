@@ -7,9 +7,27 @@ import { LoadingScreen } from '../../components/common/LoadingScreen'
 import { getMyRequests, getRequesterOverview } from '../../services/mock/requesterService'
 import type { RequestItem, RequesterOverview } from '../../types/requester'
 
+function getUpcomingRequests(requests: RequestItem[]) {
+  return [...requests]
+    .sort((left, right) => {
+      const leftDate = new Date(`${left.requestDate}T${left.startTime}`)
+      const rightDate = new Date(`${right.requestDate}T${right.startTime}`)
+      return leftDate.getTime() - rightDate.getTime()
+    })
+    .slice(0, 4)
+}
+
+function formatUpcomingDay(value: string) {
+  return new Date(`${value}T00:00:00`).toLocaleDateString('nl-NL', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+  })
+}
+
 export function RequesterDashboardPage() {
   const [overview, setOverview] = useState<RequesterOverview | null>(null)
-  const [recentRequests, setRecentRequests] = useState<RequestItem[]>([])
+  const [requests, setRequests] = useState<RequestItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -25,7 +43,7 @@ export function RequesterDashboardPage() {
         ])
 
         setOverview(overviewResponse)
-        setRecentRequests(requestsResponse.slice(0, 3))
+        setRequests(requestsResponse)
       } catch {
         setError('Dashboardgegevens konden niet worden geladen.')
       } finally {
@@ -47,6 +65,8 @@ export function RequesterDashboardPage() {
       </div>
     )
   }
+
+  const upcomingRequests = getUpcomingRequests(requests)
 
   return (
     <div className="space-y-6">
@@ -87,47 +107,68 @@ export function RequesterDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <section className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold text-white">Recente aanvragen</h2>
-              <p className="mt-1 text-sm text-slate-400">Snel overzicht van je laatste dossiers</p>
-            </div>
-            <Link
-              to="/dashboard/requester/requests"
-              className="text-sm font-medium text-slate-200 underline decoration-white/20 underline-offset-4"
-            >
-              Alles bekijken
-            </Link>
-          </div>
-
-          <div className="mt-5 space-y-3">
-            {recentRequests.map((request) => (
+      <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="space-y-6">
+          <section className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-white">Upcoming schema</h2>
+                <p className="mt-1 text-sm text-slate-400">Je eerstvolgende pickups en productiemomenten</p>
+              </div>
               <Link
-                key={request.id}
-                to={`/dashboard/requester/requests/${request.id}`}
-                className="block rounded-3xl border border-white/10 bg-panel-800/70 p-4 transition hover:border-brand-400/40"
+                to="/dashboard/requester/requests"
+                className="text-sm font-medium text-slate-200 underline decoration-white/20 underline-offset-4"
               >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-slate-400">{request.id}</p>
-                    <p className="mt-1 text-base font-semibold text-white">{request.title}</p>
-                  </div>
-                  <StatusBadge value={request.status} />
-                </div>
-                <div className="mt-4 grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
-                  <p>Datum: {request.requestDate}</p>
-                  <p>Locatie: {request.location}</p>
-                  <p>Activiteit: {request.activityType}</p>
-                </div>
+                Planning openen
               </Link>
-            ))}
-          </div>
-        </section>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {upcomingRequests.map((request) => (
+                <Link
+                  key={request.id}
+                  to={`/dashboard/requester/requests/${request.id}`}
+                  className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-panel-800/70 p-4 transition hover:border-brand-400/40 sm:flex-row sm:items-center"
+                >
+                  <div className="flex h-16 min-w-16 flex-col items-center justify-center rounded-2xl bg-brand-500/15 text-brand-100">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand-200/80">
+                      {formatUpcomingDay(request.requestDate).split(' ')[0]}
+                    </span>
+                    <span className="mt-1 text-lg font-semibold">
+                      {formatUpcomingDay(request.requestDate).split(' ').slice(1).join(' ')}
+                    </span>
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <p className="truncate text-base font-semibold text-white">{request.title}</p>
+                        <p className="mt-1 text-sm text-slate-400">
+                          {request.startTime} - {request.endTime} · {request.location}
+                        </p>
+                      </div>
+                      <StatusBadge value={request.status} />
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-300">
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                        {request.activityType}
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                        {request.requestedItems.length} items
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </div>
 
         <section className="rounded-[1.75rem] border border-slate-900/10 bg-sand-50 p-5 text-slate-900">
-          <h2 className="text-lg font-semibold">Snelle workflow</h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold">Snelle workflow</h2>
+          </div>
           <div className="mt-5 space-y-4">
             {[
               'Start een nieuwe aanvraag voor een aankomende productie.',
