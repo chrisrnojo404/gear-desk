@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ArrowRight, ShieldCheck } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { FormInput } from '../../components/auth/FormInput'
@@ -6,6 +7,7 @@ import { RoleBadge } from '../../components/common/RoleBadge'
 import { useAuth } from '../../hooks/useAuth'
 import { getDefaultRouteForRole } from '../../routes/routeConfig'
 import type { LoginPayload, UserRole } from '../../types/auth'
+import { Button } from '../../components/ui/Button'
 
 const demoAccounts: Array<{ email: string; role: UserRole }> = [
   { email: 'aanvrager@geardesk.local', role: 'level_1' },
@@ -49,27 +51,31 @@ export function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-xl">
-      <div className="rounded-[2rem] border border-slate-900/10 bg-sand-50 p-5 shadow-2xl shadow-slate-950/20 sm:p-6">
-        <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 sm:p-8">
-          <p className="text-sm font-medium tracking-[0.18em] text-brand-600 uppercase">
+    <div className="w-full max-w-4xl">
+      <div className="panel-glow rounded-[2rem] border border-white/10 bg-panel-900/88 p-5 shadow-2xl shadow-slate-950/20 sm:p-6">
+        <div className="rounded-[1.75rem] border border-slate-200/80 bg-slate-50 p-7 sm:p-9">
+          <div className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-100 px-4 py-2 text-xs font-semibold tracking-[0.18em] text-brand-700 uppercase">
+            <ShieldCheck className="h-4 w-4" />
+            Secure login
+          </div>
+          <p className="mt-5 text-sm font-semibold tracking-[0.18em] text-brand-600 uppercase">
             AUTH / Login
           </p>
           <h2 className="mt-3 font-display text-3xl font-semibold text-slate-950">
             Meld je aan bij Gear Desk
           </h2>
-          <p className="mt-3 text-sm leading-6 text-slate-500">
+          <p className="mt-3 text-sm leading-6 text-slate-600">
             Gebruik een demoaccount om de loginflow te testen. Na inloggen word je op basis van je
             rol naar de juiste omgeving gestuurd.
           </p>
 
-          <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+          <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-200/70">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-slate-900">Demo toegang</p>
+                <p className="text-sm font-medium text-slate-950">Demo toegang</p>
                 <p className="text-xs text-slate-500">Wachtwoord voor alle accounts: `Welkom123!`</p>
               </div>
-              <div className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-white uppercase">
+              <div className="rounded-full bg-brand-500 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-white uppercase">
                 Mock API
               </div>
             </div>
@@ -80,13 +86,13 @@ export function LoginPage() {
                   key={account.email}
                   type="button"
                   onClick={() => fillDemoAccount(account.email)}
-                  className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:border-brand-300 hover:bg-brand-50"
+                  className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left transition hover:border-brand-300 hover:bg-brand-50"
                 >
                   <div>
-                    <p className="text-sm font-medium text-slate-900">{account.email}</p>
+                    <p className="text-sm font-medium text-slate-950">{account.email}</p>
                     <p className="mt-1 text-xs text-slate-500">Klik om dit account in te vullen</p>
                   </div>
-                  <RoleBadge role={account.role} />
+                  <RoleBadge role={account.role} variant="light" />
                 </button>
               ))}
             </div>
@@ -99,6 +105,7 @@ export function LoginPage() {
               label="E-mailadres"
               placeholder="naam@organisatie.nl"
               autoComplete="email"
+              variant="light"
               error={errors.email}
               {...register('email', {
                 required: 'E-mailadres is verplicht.',
@@ -116,6 +123,7 @@ export function LoginPage() {
               placeholder="Voer je wachtwoord in"
               autoComplete="current-password"
               hint="Demo: Welkom123!"
+              variant="light"
               error={errors.password}
               {...register('password', {
                 required: 'Wachtwoord is verplicht.',
@@ -132,13 +140,15 @@ export function LoginPage() {
               </div>
             ) : null}
 
-            <button
+            <Button
               type="submit"
               disabled={isLoggingIn}
-              className="w-full rounded-2xl bg-slate-950 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+              size="lg"
+              fullWidth
             >
               {isLoggingIn ? 'Inloggen...' : 'Inloggen'}
-            </button>
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </form>
         </div>
       </div>

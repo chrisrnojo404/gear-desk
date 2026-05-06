@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { LoadingScreen } from '../../components/common/LoadingScreen'
 import { PageHeader } from '../../components/dashboard/PageHeader'
 import { StatusBadge } from '../../components/dashboard/StatusBadge'
+import { Button } from '../../components/ui/Button'
 import {
   getProcessorRequestById,
   updateProcessorRequestStatus,
@@ -85,16 +86,12 @@ export function ProcessRequestPage() {
         description="Controleer aanvraaginhoud, zet de status door en open desgewenst direct de printpagina."
         actions={
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/10"
-            >
+            <Button variant="secondary" onClick={() => navigate(-1)}>
               Terug
-            </button>
+            </Button>
             <Link
               to={`/dashboard/processor/requests/${request.id}/print`}
-              className="rounded-2xl bg-sand-50 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-white"
+              className="inline-flex items-center justify-center rounded-2xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-400"
             >
               Open printpagina
             </Link>
@@ -103,7 +100,7 @@ export function ProcessRequestPage() {
       />
 
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-        <section className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5 sm:p-6">
+        <section className="card-surface p-5 sm:p-6">
           <div className="flex flex-wrap items-center gap-3">
             <StatusBadge value={request.status} />
             <span className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold tracking-[0.14em] text-slate-300 uppercase">
@@ -153,44 +150,41 @@ export function ProcessRequestPage() {
         </section>
 
         <aside className="space-y-6">
-          <section className="rounded-[1.75rem] border border-slate-900/10 bg-sand-50 p-5 text-slate-900">
+          <section className="card-surface bg-panel-800/75 p-5 text-white">
             <h2 className="text-lg font-semibold">Aangevraagde items</h2>
             <div className="mt-5 space-y-3">
               {request.requestedItems.map((item) => (
-                <div key={item} className="rounded-2xl bg-white px-4 py-3 shadow-sm">
-                  <p className="text-sm font-medium">{item}</p>
+                <div key={item} className="rounded-2xl bg-white/5 px-4 py-3 shadow-sm">
+                  <p className="text-sm font-medium text-white">{item}</p>
                 </div>
               ))}
             </div>
           </section>
 
-          <section className="rounded-[1.75rem] border border-white/10 bg-panel-800/75 p-5">
+          <section className="card-surface bg-panel-800/75 p-5">
             <h2 className="text-lg font-semibold text-white">Verwerkactie</h2>
             <div className="mt-5 grid gap-3">
-              <button
-                type="button"
+              <Button
                 disabled={isUpdating}
                 onClick={() => handleStatusChange('approved')}
-                className="rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+                className="bg-emerald-500 hover:bg-emerald-400"
               >
                 Goedkeuren
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
                 disabled={isUpdating}
                 onClick={() => handleStatusChange('in_use')}
-                className="rounded-2xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+                className="bg-orange-500 hover:bg-orange-400"
               >
                 Markeer als in gebruik
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="secondary"
                 disabled={isUpdating}
                 onClick={() => handleStatusChange('pending')}
-                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Zet terug naar pending
-              </button>
+              </Button>
             </div>
           </section>
         </aside>

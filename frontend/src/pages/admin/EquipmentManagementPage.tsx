@@ -2,8 +2,42 @@ import { useEffect, useState } from 'react'
 import { LoadingScreen } from '../../components/common/LoadingScreen'
 import { PageHeader } from '../../components/dashboard/PageHeader'
 import { StatusBadge } from '../../components/dashboard/StatusBadge'
+import { DataTable, type DataTableColumn } from '../../components/ui/DataTable'
 import { getAdminEquipment } from '../../services/mock/adminService'
 import type { AdminEquipmentItem } from '../../types/admin'
+
+const columns: DataTableColumn<AdminEquipmentItem>[] = [
+  {
+    key: 'asset',
+    header: 'Asset',
+    render: (item) => (
+      <div>
+        <p className="text-base font-semibold text-white">{item.name}</p>
+        <p className="mt-1 text-sm text-slate-400">{item.id}</p>
+      </div>
+    ),
+  },
+  {
+    key: 'category',
+    header: 'Categorie',
+    render: (item) => <p className="text-sm text-slate-300">{item.category}</p>,
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (item) => <StatusBadge value={item.status} />,
+  },
+  {
+    key: 'serial',
+    header: 'Serienummer',
+    render: (item) => <p className="text-sm text-slate-300">{item.serialNumber}</p>,
+  },
+  {
+    key: 'location',
+    header: 'Locatie',
+    render: (item) => <p className="text-sm text-slate-300">{item.location}</p>,
+  },
+]
 
 export function EquipmentManagementPage() {
   const [equipment, setEquipment] = useState<AdminEquipmentItem[]>([])
@@ -43,30 +77,14 @@ export function EquipmentManagementPage() {
         <div className="rounded-3xl border border-rose-400/20 bg-rose-500/10 p-6 text-sm text-rose-100">
           {error}
         </div>
-      ) : null}
-
-      <div className="grid gap-4 md:grid-cols-2">
-        {equipment.map((item) => (
-          <article
-            key={item.id}
-            className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs tracking-[0.16em] text-slate-400 uppercase">{item.id}</p>
-                <h2 className="mt-2 text-lg font-semibold text-white">{item.name}</h2>
-              </div>
-              <StatusBadge value={item.status} />
-            </div>
-
-            <div className="mt-5 grid gap-3 text-sm text-slate-300">
-              <p>Categorie: {item.category}</p>
-              <p>Serienummer: {item.serialNumber}</p>
-              <p>Locatie: {item.location}</p>
-            </div>
-          </article>
-        ))}
-      </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={equipment}
+          getRowKey={(item) => item.id}
+          emptyMessage="Er is geen apparatuur beschikbaar."
+        />
+      )}
     </div>
   )
 }

@@ -18,7 +18,7 @@ export interface AdminEquipmentItem {
   id: string
   name: string
   category: string
-  status: 'available' | 'in_use' | 'maintenance'
+  status: 'available' | 'reserved' | 'in_use' | 'defect'
   serialNumber: string
   location: string
 }

@@ -63,7 +63,7 @@ const adminEquipment: AdminEquipmentItem[] = [
     id: 'EQ-303',
     name: 'Aputure Nova P300c',
     category: 'Lighting',
-    status: 'maintenance',
+    status: 'defect',
     serialNumber: 'ANP-44321',
     location: 'Technische dienst',
   },
@@ -71,7 +71,7 @@ const adminEquipment: AdminEquipmentItem[] = [
     id: 'EQ-304',
     name: 'Sachtler Flowtech Tripod',
     category: 'Accessories',
-    status: 'available',
+    status: 'reserved',
     serialNumber: 'SFT-88210',
     location: 'Accessoirewand',
   },
@@ -154,7 +154,7 @@ export async function getAdminOverview(): Promise<AdminOverview> {
 
   return {
     totalUsers: adminUsers.length,
-    activeEquipment: adminEquipment.filter((item) => item.status !== 'maintenance').length,
+    activeEquipment: adminEquipment.filter((item) => item.status !== 'defect').length,
     categories: adminCategories.length,
     openIncidents: adminLogs.filter((entry) => entry.severity !== 'info').length,
   }

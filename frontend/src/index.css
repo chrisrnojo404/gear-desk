@@ -2,13 +2,15 @@
 
 @theme {
   --font-sans: "Avenir Next", "Segoe UI", sans-serif;
-  --font-display: "Sora", "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
   --color-brand-50: #eef7ff;
   --color-brand-100: #d7ebff;
+  --color-brand-300: #73b0ff;
   --color-brand-500: #2984ff;
   --color-brand-600: #176ae2;
   --color-brand-700: #1255b4;
   --color-ink-950: #07111f;
+  --color-panel-950: #08101d;
   --color-panel-900: #0f1728;
   --color-panel-800: #182236;
   --color-panel-700: #26324a;
@@ -23,9 +25,9 @@
   :root {
     color: #dbe4f0;
     background:
-      radial-gradient(circle at top left, rgba(41, 132, 255, 0.22), transparent 28%),
-      radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent 24%),
-      linear-gradient(135deg, #07111f 0%, #10182b 48%, #f3f0e8 48.1%, #f8f7f4 100%);
+      radial-gradient(circle at top left, rgba(41, 132, 255, 0.28), transparent 26%),
+      radial-gradient(circle at bottom right, rgba(115, 176, 255, 0.16), transparent 24%),
+      linear-gradient(180deg, #050b15 0%, #09111f 35%, #0e1727 100%);
     font-family: var(--font-sans);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -57,7 +59,7 @@
       linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
     background-size: 72px 72px;
     mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 75%);
-    opacity: 0.28;
+    opacity: 0.18;
   }
 
   a {
@@ -82,7 +84,15 @@
 
   .panel-glow {
     box-shadow:
-      0 24px 80px rgba(7, 17, 31, 0.38),
+      0 30px 80px rgba(1, 7, 15, 0.52),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .card-surface {
+    @apply rounded-[1.75rem] border border-white/10 bg-white/5;
+  }
+
+  .panel-surface {
+    @apply rounded-[2rem] border border-white/10 bg-panel-900/85 backdrop-blur-xl;
   }
 }

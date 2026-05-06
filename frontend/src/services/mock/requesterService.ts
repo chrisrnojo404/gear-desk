@@ -53,7 +53,7 @@ const equipment: EquipmentItem[] = [
     name: 'Sony FX3',
     category: 'camera',
     quantityAvailable: 4,
-    condition: 'excellent',
+    status: 'available',
     location: 'Magazijn 1',
   },
   {
@@ -61,7 +61,7 @@ const equipment: EquipmentItem[] = [
     name: 'Canon C70',
     category: 'camera',
     quantityAvailable: 2,
-    condition: 'good',
+    status: 'reserved',
     location: 'Magazijn 1',
   },
   {
@@ -69,7 +69,7 @@ const equipment: EquipmentItem[] = [
     name: 'Rode Wireless GO II',
     category: 'audio',
     quantityAvailable: 6,
-    condition: 'excellent',
+    status: 'available',
     location: 'Audio kast',
   },
   {
@@ -77,7 +77,7 @@ const equipment: EquipmentItem[] = [
     name: 'Aputure 300D',
     category: 'lighting',
     quantityAvailable: 3,
-    condition: 'good',
+    status: 'in_use',
     location: 'Lichtopslag',
   },
   {
@@ -85,7 +85,7 @@ const equipment: EquipmentItem[] = [
     name: 'Tripod kit',
     category: 'accessories',
     quantityAvailable: 5,
-    condition: 'maintenance',
+    status: 'defect',
     location: 'Accessoirewand',
   },
 ]

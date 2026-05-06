@@ -3,8 +3,51 @@ import { Link } from 'react-router-dom'
 import { LoadingScreen } from '../../components/common/LoadingScreen'
 import { PageHeader } from '../../components/dashboard/PageHeader'
 import { StatusBadge } from '../../components/dashboard/StatusBadge'
+import { DataTable, type DataTableColumn } from '../../components/ui/DataTable'
 import { getMyRequests } from '../../services/mock/requesterService'
 import type { RequestItem } from '../../types/requester'
+
+const columns: DataTableColumn<RequestItem>[] = [
+  {
+    key: 'request',
+    header: 'Aanvraag',
+    className: 'lg:col-span-2',
+    render: (request) => (
+      <div>
+        <p className="text-xs tracking-[0.12em] text-slate-400 uppercase">{request.id}</p>
+        <p className="mt-1 text-base font-semibold text-white">{request.title}</p>
+        <p className="mt-2 text-sm text-slate-300">{request.purpose}</p>
+      </div>
+    ),
+  },
+  {
+    key: 'location',
+    header: 'Locatie',
+    render: (request) => <p className="text-sm text-slate-300">{request.location}</p>,
+  },
+  {
+    key: 'shootDate',
+    header: 'Opnamedatum',
+    render: (request) => <p className="text-sm text-slate-300">{request.shootDate}</p>,
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (request) => <StatusBadge value={request.status} />,
+  },
+  {
+    key: 'action',
+    header: 'Actie',
+    render: (request) => (
+      <Link
+        to={`/dashboard/requester/requests/${request.id}`}
+        className="inline-flex rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
+      >
+        Details
+      </Link>
+    ),
+  },
+]
 
 export function MyRequestsPage() {
   const [requests, setRequests] = useState<RequestItem[]>([])
@@ -46,43 +89,12 @@ export function MyRequestsPage() {
         </div>
       ) : null}
 
-      <div className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5">
-        <div className="hidden grid-cols-[1.05fr_0.75fr_0.65fr_0.65fr_120px] gap-4 border-b border-white/10 px-5 py-4 text-xs font-semibold tracking-[0.18em] text-slate-400 uppercase lg:grid">
-          <span>Aanvraag</span>
-          <span>Locatie</span>
-          <span>Opnamedatum</span>
-          <span>Status</span>
-          <span>Actie</span>
-        </div>
-
-        <div className="divide-y divide-white/10">
-          {requests.map((request) => (
-            <div
-              key={request.id}
-              className="grid gap-4 px-5 py-5 lg:grid-cols-[1.05fr_0.75fr_0.65fr_0.65fr_120px] lg:items-center"
-            >
-              <div>
-                <p className="text-xs tracking-[0.12em] text-slate-400 uppercase">{request.id}</p>
-                <p className="mt-1 text-base font-semibold text-white">{request.title}</p>
-                <p className="mt-2 text-sm text-slate-300">{request.purpose}</p>
-              </div>
-              <p className="text-sm text-slate-300">{request.location}</p>
-              <p className="text-sm text-slate-300">{request.shootDate}</p>
-              <div>
-                <StatusBadge value={request.status} />
-              </div>
-              <div>
-                <Link
-                  to={`/dashboard/requester/requests/${request.id}`}
-                  className="inline-flex rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
-                >
-                  Details
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <DataTable
+        columns={columns}
+        data={requests}
+        getRowKey={(request) => request.id}
+        emptyMessage="Er zijn nog geen aanvragen beschikbaar."
+      />
     </div>
   )
 }

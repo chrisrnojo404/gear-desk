@@ -21,7 +21,7 @@ export interface EquipmentItem {
   name: string
   category: EquipmentCategory
   quantityAvailable: number
-  condition: 'excellent' | 'good' | 'maintenance'
+  status: 'available' | 'reserved' | 'in_use' | 'defect'
   location: string
 }
 

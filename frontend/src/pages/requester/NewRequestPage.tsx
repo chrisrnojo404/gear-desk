@@ -3,6 +3,9 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { FormInput } from '../../components/auth/FormInput'
 import { PageHeader } from '../../components/dashboard/PageHeader'
+import { Button } from '../../components/ui/Button'
+import { FormSelect } from '../../components/ui/FormSelect'
+import { FormTextarea } from '../../components/ui/FormTextarea'
 import { createRequest } from '../../services/mock/requesterService'
 import type { NewRequestFormValues } from '../../types/requester'
 
@@ -45,7 +48,7 @@ export function NewRequestPage() {
       <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
         <form
           onSubmit={onSubmit}
-          className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5 sm:p-6"
+          className="card-surface p-5 sm:p-6"
         >
           <div className="grid gap-5 md:grid-cols-2">
             <div className="md:col-span-2">
@@ -74,14 +77,14 @@ export function NewRequestPage() {
               })}
             />
 
-            <label className="block">
-              <div className="mb-2 text-sm font-medium text-slate-200">Prioriteit</div>
-              <select
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15"
-                {...register('priority', {
-                  required: 'Prioriteit is verplicht.',
-                })}
-              >
+            <FormSelect
+              id="priority"
+              label="Prioriteit"
+              error={errors.priority}
+              {...register('priority', {
+                required: 'Prioriteit is verplicht.',
+              })}
+            >
                 <option value="low" className="text-slate-900">
                   Laag
                 </option>
@@ -91,8 +94,7 @@ export function NewRequestPage() {
                 <option value="high" className="text-slate-900">
                   Hoog
                 </option>
-              </select>
-            </label>
+            </FormSelect>
 
             <FormInput
               id="shootDate"
@@ -114,12 +116,13 @@ export function NewRequestPage() {
               })}
             />
 
-            <label className="block md:col-span-2">
-              <div className="mb-2 text-sm font-medium text-slate-200">Doel van de productie</div>
-              <textarea
+            <div className="md:col-span-2">
+              <FormTextarea
+                id="purpose"
                 rows={4}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-brand-500 focus:bg-white/8 focus:ring-4 focus:ring-brand-500/15"
+                label="Doel van de productie"
                 placeholder="Omschrijf kort waar de apparatuur voor nodig is"
+                error={errors.purpose}
                 {...register('purpose', {
                   required: 'Doel van de productie is verplicht.',
                   minLength: {
@@ -128,37 +131,30 @@ export function NewRequestPage() {
                   },
                 })}
               />
-              {errors.purpose ? (
-                <p className="mt-2 text-sm text-rose-300">{errors.purpose.message}</p>
-              ) : null}
-            </label>
+            </div>
 
-            <label className="block md:col-span-2">
-              <div className="mb-2 text-sm font-medium text-slate-200">
-                Gewenste apparatuur
-              </div>
-              <textarea
+            <div className="md:col-span-2">
+              <FormTextarea
+                id="requestedItems"
                 rows={3}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-brand-500 focus:bg-white/8 focus:ring-4 focus:ring-brand-500/15"
+                label="Gewenste apparatuur"
                 placeholder="Bijv. Sony FX3, Rode Wireless GO II, Aputure 300D"
+                error={errors.requestedItems}
                 {...register('requestedItems', {
                   required: 'Voer minstens een apparaat in.',
                 })}
               />
-              {errors.requestedItems ? (
-                <p className="mt-2 text-sm text-rose-300">{errors.requestedItems.message}</p>
-              ) : null}
-            </label>
+            </div>
 
-            <label className="block md:col-span-2">
-              <div className="mb-2 text-sm font-medium text-slate-200">Notities</div>
-              <textarea
+            <div className="md:col-span-2">
+              <FormTextarea
+                id="notes"
                 rows={3}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-brand-500 focus:bg-white/8 focus:ring-4 focus:ring-brand-500/15"
+                label="Notities"
                 placeholder="Extra wensen, pickup-tijd of aandachtspunten"
                 {...register('notes')}
               />
-            </label>
+            </div>
           </div>
 
           {submitError ? (
@@ -168,17 +164,17 @@ export function NewRequestPage() {
           ) : null}
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <button
+            <Button
               type="submit"
               disabled={isSubmittingForm}
-              className="rounded-2xl bg-sand-50 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+              size="lg"
             >
               {isSubmittingForm ? 'Aanvraag wordt opgeslagen...' : 'Aanvraag indienen'}
-            </button>
+            </Button>
           </div>
         </form>
 
-        <aside className="rounded-[1.75rem] border border-white/10 bg-panel-800/75 p-5">
+        <aside className="card-surface bg-panel-800/75 p-5">
           <h2 className="text-lg font-semibold text-white">Tips voor een sterke aanvraag</h2>
           <div className="mt-5 space-y-4 text-sm leading-6 text-slate-300">
             <p>Wees specifiek over locatie, draaidag en gewenste set-up.</p>
